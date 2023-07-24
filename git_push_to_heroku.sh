@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Add all changed files to git
 git add .
 
