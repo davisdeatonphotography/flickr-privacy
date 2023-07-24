@@ -9,6 +9,7 @@
 <div data-barba="container" data-barba-namespace="date">
     <h1>Photos by Date</h1>
     <form method="POST">
+        {{ csrf_token() }}
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <label for="min_date">From:</label>
         <input type="date" id="min_date" name="min_date">

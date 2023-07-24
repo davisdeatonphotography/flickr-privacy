@@ -2,6 +2,7 @@
 {% block content %}
 <h1 class="text-3xl mb-4">Set Privacy by Metadata</h1>
 <form method="POST">
+    {{ csrf_token() }}
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="mb-4">
         <label class="block text-gray-700 font-bold mb-2" for="min_date">
