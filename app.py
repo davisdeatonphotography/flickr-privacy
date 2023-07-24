@@ -23,7 +23,7 @@ users = {
     "davis": User("davis", "davis", generate_password_hash("test")),
     "davisdeaton": User("davisdeaton", "davisdeaton", generate_password_hash("1234")),
 }
-flickr = flickrapi.FlickrAPI('1abc2735254269820d503c03d527e4c9', '8ee50ae57a05f23c', cache=True)
+flickr = flickrapi.FlickrAPI(os.environ['FLICKR_API_KEY'], os.environ['FLICKR_API_SECRET'], cache=True)
 
 @app.route('/')
 def index():
