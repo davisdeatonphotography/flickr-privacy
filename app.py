@@ -60,7 +60,10 @@ def set_privacy_metadata():
     max_date = request.form.get('max_date')
     is_public = request.form.get('is_public')
     try:
-        photos = flickr.photos.search(user_id=current_user.id, min_taken_date=min_date, max_taken_date=max_date)
+        user_info = flickr.people.findByUsername(username=current_user.id)
+        flickr_user_id = user_info['user']['nsid']
+
+        photos = flickr.photos.search(user_id=flickr_user_id, min_taken_date=min_date, max_taken_date=max_date)
         for photo in photos['photos']['photo']:
             flickr.photos.setPerms(photo_id=photo['id'], is_public=is_public, 
                                    is_friend=0, is_family=0, perm_comment=0, perm_addmeta=0)
@@ -75,7 +78,10 @@ def set_album_privacy():
     album_id = request.form.get('album_id')
     is_public = request.form.get('is_public')
     try:
-        photos = flickr.photosets.getPhotos(user_id=current_user.id, photoset_id=album_id)
+        user_info = flickr.people.findByUsername(username=current_user.id)
+        flickr_user_id = user_info['user']['nsid']
+
+        photos = flickr.photosets.getPhotos(user_id=flickr_user_id, photoset_id=album_id)
         for photo in photos['photoset']['photo']:
             flickr.photos.setPerms(photo_id=photo['id'], is_public=is_public, 
                                    is_friend=0, is_family=0, perm_comment=0, perm_addmeta=0)
@@ -91,7 +97,10 @@ def photos():
     if request.method == 'POST':
         num_photos = request.form.get('num_photos')
         try:
-            photos = flickr.people.getPhotos(user_id=current_user.id, per_page=int(num_photos))
+            user_info = flickr.people.findByUsername(username=current_user.id)
+            flickr_user_id = user_info['user']['nsid']
+
+            photos = flickr.people.getPhotos(user_id=flickr_user_id, per_page=int(num_photos))
             return render_template('photos.html', photos=photos['photos']['photo'])
         except Exception as e:
             logging.error(str(e))
@@ -106,7 +115,10 @@ def set_privacy_date_range():
     end_date = request.form.get('end_date')
     is_public = request.form.get('is_public')
     try:
-        photos = flickr.photos.search(user_id=current_user.id, min_upload_date=start_date, max_upload_date=end_date)
+        user_info = flickr.people.findByUsername(username=current_user.id)
+        flickr_user_id = user_info['user']['nsid']
+
+        photos = flickr.photos.search(user_id=flickr_user_id, min_upload_date=start_date, max_upload_date=end_date)
         for photo in photos['photos']['photo']:
             flickr.photos.setPerms(photo_id=photo['id'], is_public=is_public, 
                                    is_friend=0, is_family=0, perm_comment=0, perm_addmeta=0)
@@ -122,9 +134,8 @@ def albums():
     if request.method == 'POST':
         album_id = request.form.get('album_id')
         try:
-            # Get the Flickr user ID
             user_info = flickr.people.findByUsername(username=current_user.id)
-            flickr_user_id = user_info['user']['id']
+            flickr_user_id = user_info['user']['nsid']
 
             photos = flickr.photosets.getPhotos(user_id=flickr_user_id, photoset_id=album_id)
             return render_template('photos.html', photos=photos['photoset']['photo'])
@@ -133,9 +144,8 @@ def albums():
             flash("Error fetching album photos", "error")
     else:
         try:
-            # Get the Flickr user ID
             user_info = flickr.people.findByUsername(username=current_user.id)
-            flickr_user_id = user_info['user']['id']
+            flickr_user_id = user_info['user']['nsid']
 
             albums = flickr.photosets.getList(user_id=flickr_user_id)
             return render_template('albums.html', albums=albums['photosets']['photoset'])
@@ -152,7 +162,10 @@ def date():
         min_date = request.form.get('min_date')
         max_date = request.form.get('max_date')
         try:
-            photos = flickr.people.getPhotos(user_id=current_user.id, min_upload_date=min_date, max_upload_date=max_date)
+            user_info = flickr.people.findByUsername(username=current_user.id)
+            flickr_user_id = user_info['user']['nsid']
+
+            photos = flickr.people.getPhotos(user_id=flickr_user_id, min_upload_date=min_date, max_upload_date=max_date)
             return render_template('photos.html', photos=photos['photos']['photo'])
         except Exception as e:
             logging.error(e, exc_info=True)
