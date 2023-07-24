@@ -69,7 +69,7 @@ def set_privacy_metadata():
         flash('Flickr API error: {}'.format(e), 'error')
     return redirect(url_for('index'))
 
-@app.route('/set_album_privacy', methods=['POST'])
+@app.route('/set_album_privacy', methods=['GET', 'POST'])
 @login_required
 def set_album_privacy():
     album_id = request.form.get('album_id')
@@ -100,7 +100,7 @@ def photos():
         flash("Error fetching photos: {}".format(e), "error")
     return render_template('photos.html')
 
-@app.route('/set_privacy_date_range', methods=['POST'])
+@app.route('/set_privacy_date_range', methods=['GET', 'POST'])
 @login_required
 def set_privacy_date_range():
     start_date = request.form.get('start_date')
