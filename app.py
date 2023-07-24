@@ -25,18 +25,6 @@ users = {
 }
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if username in users and check_password_hash(users[username], password):
-            user = User(id=username, username=username, password_hash=users[username])
-            login_user(user)
-            return redirect(url_for('index'))
-        else:
-            flash('Invalid username or password', 'error')
-    return render_template('login.html')
 
 flickr = flickrapi.FlickrAPI('1abc2735254269820d503c03d527e4c9', '8ee50ae57a05f23c', cache=True)
 
