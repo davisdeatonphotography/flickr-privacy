@@ -22,9 +22,6 @@ users = {
     "davis": generate_password_hash("test"),
     "davisdeaton": generate_password_hash("1234"),
 }
-
-
-
 flickr = flickrapi.FlickrAPI('1abc2735254269820d503c03d527e4c9', '8ee50ae57a05f23c', cache=True)
 
 @app.route('/')
