@@ -8,7 +8,7 @@ git commit -m "v 0.1."
 
 # Set up Git credentials for GitHub using your personal access token
 git config credential.helper 'store --file ~/.git-credentials'
-echo "https://github.com:davisdeatonphotography:${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}" >> ~/.git-credentials
+echo "https://github.com:davisdeatonphotography:${PERSONAL_ACCESS_TOKEN}" >> ~/.git-credentials
 
 # Push the changes to your GitHub repository
 git push origin master
