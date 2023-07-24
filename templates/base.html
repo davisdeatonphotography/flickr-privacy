@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/swup@2.0.0/dist/swup.min.css">
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-100 text-gray-800">
+<nav class="glass flex justify-between items-center py-4 px-8 bg-white border-b-4 border-blue-500">
+    <a href="/" class="text-xl font-bold">
+        Flickr Privacy
+    </a>
+    <div>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}" class="text-blue-500">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="text-blue-500">Login</a>
+        {% endif %}
+    </div>
+</nav>
+
+<div id="swup" class="glass max-w-5xl mx-auto">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="bg-{{ category }}-100 text-{{ category }}-800 px-4 py-2 my-4 rounded shadow-md">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</div>
+
+<script src="https://unpkg.com/swup@2.0.0/dist/swup.min.js"></script>
+<script>
+    const swup = new Swup();
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

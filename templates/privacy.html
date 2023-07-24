@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-3xl mb-4">Manage Photo Privacy</h1>
+<form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="mb-4">
+        <label class="block text-gray-700 font-bold mb-2" for="photo_id">
+            Photo ID
+        </label>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+               id="photo_id" type="text" name="photo_id">
+    </div>
+    <div class="mb-4">
+        <label class="inline-flex items-center">
+            <input type="checkbox" name="is_public" class="form-checkbox">
+            <span class="ml-2">Make photo public</span>
+        </label>
+    </div>
+    <button type="submit"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        Update Privacy
+    </button>
+</form>
+{% endblock %}

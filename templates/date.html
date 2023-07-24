@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://unpkg.com/@barba/core"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
+    <title>Photos by Date</title>
+</head>
+<body data-swup-transition>
+<div data-barba="container" data-barba-namespace="date">
+    <h1>Photos by Date</h1>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="min_date">From:</label>
+        <input type="date" id="min_date" name="min_date">
+        <label for="max_date">To:</label>
+        <input type="date" id="max_date" name="max_date">
+        <input type="submit" value="Fetch Photos">
+    </form>
+    {% for photo in photos %}
+        <img src="{{ photo.url_m }}" alt="{{ photo.title }}">
+    {% endfor %}
+</div>
+
+<script src="//unpkg.com/swup@2.0.0/dist/swup.min.js"></script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
+
+<script src="//unpkg.com/@barba/core@2.10.0/dist/barba.min.js"></script>
+
+<script src="//unpkg.com/@barba/prefetch@2.1.0/dist/barba-prefetch.min.js"></script>
+
+<script>
+    barba.init({
+        transitions: [{
+            name: 'fade',
+            leave(data) {
+                return gsap.to(data.current.container, {
+                    opacity: 0
+                });
+            },
+            enter(data) {
+                return gsap.from(data.next.container, {
+                    opacity: 0
+                });
+            }
+        }]
+    });
+</script>
+</body>
+</html>

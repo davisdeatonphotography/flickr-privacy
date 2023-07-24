@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-3xl mb-4">My Photos</h1>
+<div class="grid grid-cols-3 gap-4">
+    {% for photo in photos %}
+        <div>
+            <img src="{{ photo.url }}" class="rounded shadow-md">
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

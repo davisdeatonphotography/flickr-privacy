@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-3xl mb-4">My Albums</h1>
+<div class="grid grid-cols-3 gap-4">
+    {% for album in albums %}
+        <div class="bg-white p-4 rounded shadow-md">
+            <h3 class="text-xl mb-2">{{ album.title }}</h3>
+            {% for photo in album.photos[:4] %}
+                <img src="{{ photo.thumbnail }}" class="rounded mb-2">
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
