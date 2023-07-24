@@ -5,6 +5,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from werkzeug.security import check_password_hash, generate_password_hash
 import flickrapi
 from flask_wtf.csrf import CSRFProtect
+
 app = Flask(__name__)
 app.secret_key = '1234'  # Replace 'your_secret_key' with a real secret key
 csrf = CSRFProtect(app)
@@ -19,8 +20,8 @@ class User(UserMixin):
 
 # This is your hardcoded user data
 users = {
-    "davis": generate_password_hash("test"),
-    "davisdeaton": generate_password_hash("1234"),
+    "davis": User("davis", "davis", generate_password_hash("test")),
+    "davisdeaton": User("davisdeaton", "davisdeaton", generate_password_hash("1234")),
 }
 flickr = flickrapi.FlickrAPI('1abc2735254269820d503c03d527e4c9', '8ee50ae57a05f23c', cache=True)
 
@@ -30,15 +31,16 @@ def index():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
-
+    user = users.get(user_id)
+    if user:
+        return user
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
+        user = users.get(username)
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
             return redirect(url_for('index'))
@@ -61,7 +63,8 @@ def set_privacy_metadata():
     try:
         photos = flickr.photos.search(user_id=current_user.id, min_taken_date=min_date, max_taken_date=max_date)
         for photo in photos['photos']['photo']:
-            flickr.photos.setPerms(photo_id=photo['id'], is_public=is_public, is_friend=0, is_family=0, perm_comment=0, perm_addmeta=0)
+            flickr.photos.setPerms(photo_id=photo['id'], is_public=is_public, 
+                                   is_friend=0, is_family=0, perm_comment=0, perm_addmeta=0)
         flash("Privacy settings updated successfully", "success")
     except flickrapi.exceptions.FlickrError as e:
         flash('Flickr API error: {}'.format(e), 'error')
@@ -75,7 +78,8 @@ def set_album_privacy():
     try:
         photos = flickr.photosets.getPhotos(user_id=current_user.id, photoset_id=album_id)
         for photo in photos['photoset']['photo']:
-            flickr.photos.setPerms(photo_id=photo['id'], is_public=is_public, is_friend=0, is_family=0, perm_comment=0, perm_addmeta=0)
+            flickr.photos.setPerms(photo_id=photo['id'], is_public=is_public, 
+                                   is_friend=0, is_family=0, perm_comment=0, perm_addmeta=0)
         flash("Privacy settings updated successfully", "success")
     except Exception as e:
         logging.error(str(e))
@@ -104,7 +108,8 @@ def set_privacy_date_range():
     try:
         photos = flickr.photos.search(user_id=current_user.id, min_upload_date=start_date, max_upload_date=end_date)
         for photo in photos['photos']['photo']:
-            flickr.photos.setPerms(photo_id=photo['id'], is_public=is_public, is_friend=0, is_family=0, perm_comment=0, perm_addmeta=0)
+            flickr.photos.setPerms(photo_id=photo['id'], is_public=is_public, 
+                                   is_friend=0, is_family=0, perm_comment=0, perm_addmeta=0)
         flash("Privacy settings updated successfully", "success")
     except Exception as e:
         logging.error(str(e))
