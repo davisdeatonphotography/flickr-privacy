@@ -52,6 +52,20 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+@app.route('/landing', methods=['GET', 'POST'])
+def landing():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        # Validate the username with the Flickr API
+        user_info = flickr.people.findByUsername(username=username)
+        if 'user' in user_info:
+            # If the username is valid, log in the user
+            login_user(User(username, username, 'dummy_password_hash'))
+            return redirect(url_for('index'))
+        else:
+            flash('Invalid Flickr username', 'error')
+    return render_template('landing.html')
+
 
 @app.route('/set_privacy_metadata', methods=['GET', 'POST'])
 @login_required
