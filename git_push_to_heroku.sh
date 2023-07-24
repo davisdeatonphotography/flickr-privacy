@@ -6,11 +6,16 @@ git add .
 # Commit the changes with a message
 git commit -m "v 0.1."
 
-# Push the changes to your GitHub repository using the personal access token
+# Set up Git credentials for GitHub using your personal access token
+git config credential.helper 'store --file ~/.git-credentials'
+echo "https://github.com:davisdeatonphotography:${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}" >> ~/.git-credentials
+
+# Push the changes to your GitHub repository
 git push origin master
 
 # Set up remote for Heroku (only needs to be done once)
+alias heroku=/usr/local/bin/heroku
 heroku git:remote -a flickr-privacy
 
 # Push the changes to Heroku
-git push heroku master
+heroku git push heroku master
