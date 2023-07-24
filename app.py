@@ -10,18 +10,28 @@ app = Flask(__name__)
 app.secret_key = '1234'  # Replace 'your_secret_key' with a real secret key
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # SQLite database file
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disables a warning message
+from werkzeug.security import check_password_hash, generate_password_hash
 
-db = SQLAlchemy(app)  # SQLAlchemy instance
+# This is your hardcoded user data
+users = {
+    "davis": generate_password_hash("test"),
+    "davisdeaton": generate_password_hash("1234"),
+    
+}
 
-login_manager = LoginManager()  # LoginManager instance
-login_manager.init_app(app)
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if username in users and check_password_hash(users[username], password):
+            login_user(User(id=username, username=username, password_hash=users[username]))
+            return redirect(url_for('index'))
+        else:
+            flash('Invalid username or password', 'error')
+    return render_template('login.html')
 
-class User(UserMixin, db.Model):  # User model
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password_hash = db.Column(db.String(120), nullable=False)
 
-# Replace 'your_api_key' and 'your_api_secret' with your actual Flickr API credentials
 flickr = flickrapi.FlickrAPI('1abc2735254269820d503c03d527e4c9', '8ee50ae57a05f23c', cache=True)
 
 @app.route('/')
