@@ -53,7 +53,7 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/set_privacy_metadata', methods=['POST'])
+@app.route('/set_privacy_metadata', methods=['GET', 'POST'])
 @login_required
 def set_privacy_metadata():
     min_date = request.form.get('min_date')
@@ -88,17 +88,16 @@ def set_album_privacy():
 @app.route('/photos', methods=['GET', 'POST'])
 @login_required
 def photos():
-    try:
-        if request.method == 'POST':
-            num_photos = request.form.get('num_photos')
-        else:
-            num_photos = 10  # Default number of photos for GET request
-        photos = flickr.people.getPhotos(user_id=current_user.id, per_page=num_photos)
-        return render_template('photos.html', photos=photos['photos']['photo'])
-    except Exception as e:
-        logging.error(e, exc_info=True)
-        flash("Error fetching photos: {}".format(e), "error")
+    if request.method == 'POST':
+        num_photos = request.form.get('num_photos')
+        try:
+            photos = flickr.people.getPhotos(user_id=current_user.id, per_page=int(num_photos))
+            return render_template('photos.html', photos=photos['photos']['photo'])
+        except Exception as e:
+            logging.error(str(e))
+            flash("Error fetching photos", "error")
     return render_template('photos.html')
+
 
 @app.route('/set_privacy_date_range', methods=['GET', 'POST'])
 @login_required
@@ -120,18 +119,31 @@ def set_privacy_date_range():
 @app.route('/albums', methods=['GET', 'POST'])
 @login_required
 def albums():
-    try:
-        if request.method == 'POST':
-            album_id = request.form.get('album_id')
-            photos = flickr.photosets.getPhotos(user_id=current_user.id, photoset_id=album_id)
+    if request.method == 'POST':
+        album_id = request.form.get('album_id')
+        try:
+            # Get the Flickr user ID
+            user_info = flickr.people.findByUsername(username=current_user.id)
+            flickr_user_id = user_info['user']['id']
+
+            photos = flickr.photosets.getPhotos(user_id=flickr_user_id, photoset_id=album_id)
             return render_template('photos.html', photos=photos['photoset']['photo'])
-        else:
-            albums = flickr.photosets.getList(user_id=current_user.id)
+        except Exception as e:
+            logging.error(str(e))
+            flash("Error fetching album photos", "error")
+    else:
+        try:
+            # Get the Flickr user ID
+            user_info = flickr.people.findByUsername(username=current_user.id)
+            flickr_user_id = user_info['user']['id']
+
+            albums = flickr.photosets.getList(user_id=flickr_user_id)
             return render_template('albums.html', albums=albums['photosets']['photoset'])
-    except Exception as e:
-        logging.error(e, exc_info=True)
-        flash("Error: {}".format(e), "error")
+        except Exception as e:
+            logging.error(str(e))
+            flash("Error fetching albums", "error")
     return render_template('albums.html')
+
 
 @app.route('/date', methods=['GET', 'POST'])
 @login_required
