@@ -10,7 +10,7 @@
     {% if current_user.is_authenticated %}
         <a href="{{ url_for('photos') }}" class="bg-blue-500 text-white px-4 py-2 rounded">View My Photos</a>
         <a href="{{ url_for('albums') }}" class="bg-blue-500 text-white px-4 py-2 rounded">View My Albums</a>
-        <a href="{{ url_for('privacy') }}" class="bg-blue-500 text-white px-4 py-2 rounded">Manage Privacy</a>
+        <a href="{{ url_for('set_album_privacy') }}" class="bg-blue-500 text-white px-4 py-2 rounded">Manage Privacy</a>
         <a href="{{ url_for('metadata') }}" class="bg-blue-500 text-white px-4 py-2 rounded">Set Privacy by Metadata</a>
         <a href="{{ url_for('register') }}" class="text-blue-500">Register</a>
 
