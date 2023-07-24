@@ -1,23 +1,38 @@
 import os
 import logging
 from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 import flickrapi
 
 app = Flask(__name__)
 app.secret_key = '1234'  # Replace 'your_secret_key' with a real secret key
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # SQLite database file
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disables a warning message
-from werkzeug.security import check_password_hash, generate_password_hash
+class User(UserMixin):
+    def __init__(self, id, username, password_hash):
+        self.id = id
+        self.username = username
+        self.password_hash = password_hash
+
+
+login_manager = LoginManager()  # LoginManager instance
+login_manager.init_app(app)
+
+class User(UserMixin):
+    def __init__(self, id, username, password_hash):
+        self.id = id
+        self.username = username
+        self.password_hash = password_hash
 
 # This is your hardcoded user data
 users = {
     "davis": generate_password_hash("test"),
     "davisdeaton": generate_password_hash("1234"),
-    
 }
+
+@login_manager.user_loader
+def load_user(user_id):
+    if user_id in users:
+        return User(id=user_id, username=user_id, password_hash=users[user_id])
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -25,12 +40,12 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         if username in users and check_password_hash(users[username], password):
-            login_user(User(id=username, username=username, password_hash=users[username]))
+            user = User(id=username, username=username, password_hash=users[username])
+            login_user(user)
             return redirect(url_for('index'))
         else:
             flash('Invalid username or password', 'error')
     return render_template('login.html')
-
 
 flickr = flickrapi.FlickrAPI('1abc2735254269820d503c03d527e4c9', '8ee50ae57a05f23c', cache=True)
 
@@ -42,20 +57,6 @@ def index():
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists', 'error')
-        else:
-            user = User(username=username, password_hash=generate_password_hash(password))
-            db.session.add(user)
-            db.session.commit()
-            flash('Registration successful! Please login.', 'success')
-            return redirect(url_for('login'))
-    return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
