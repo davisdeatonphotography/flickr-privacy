@@ -6,11 +6,8 @@ git add .
 # Commit the changes with a message
 git commit -m "v 0.1."
 
-# Set up remote for GitHub (only needs to be done once)
-git remote add origin https://github.com/davisdeatonphotography/flickr-privacy.git
-
-# Push the changes to your GitHub repository
-git push origin master
+# Push the changes to your GitHub repository using the personal access token
+git push origin master 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
 
 # Set up remote for Heroku (only needs to be done once)
 heroku git:remote -a flickr-privacy
