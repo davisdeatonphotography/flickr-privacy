@@ -7,9 +7,9 @@ import flickrapi
 from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
-app.secret_key = '1234'  # Replace 'your_secret_key' with a real secret key
+app.secret_key = '1234'
 csrf = CSRFProtect(app)
-login_manager = LoginManager()  # LoginManager instance
+login_manager = LoginManager()
 login_manager.init_app(app)
 
 class User(UserMixin):
@@ -18,7 +18,6 @@ class User(UserMixin):
         self.username = username
         self.password_hash = password_hash
 
-# This is your hardcoded user data
 users = {
     "davis": User("davis", "davis", generate_password_hash("test")),
     "davisdeaton": User("davisdeaton", "davisdeaton", generate_password_hash("1234")),
@@ -82,21 +81,23 @@ def set_album_privacy():
                                    is_friend=0, is_family=0, perm_comment=0, perm_addmeta=0)
         flash("Privacy settings updated successfully", "success")
     except Exception as e:
-        logging.error(str(e))
-        flash("Error updating privacy settings", "error")
+        logging.error(e, exc_info=True)
+        flash("Error updating privacy settings: {}".format(e), "error")
     return redirect(url_for('index'))
 
 @app.route('/photos', methods=['GET', 'POST'])
 @login_required
 def photos():
-    if request.method == 'POST':
-        num_photos = request.form.get('num_photos')
-        try:
-            photos = flickr.people.getPhotos(user_id=current_user.id, per_page=num_photos)
-            return render_template('photos.html', photos=photos['photos']['photo'])
-        except Exception as e:
-            logging.error(str(e))
-            flash("Error fetching photos", "error")
+    try:
+        if request.method == 'POST':
+            num_photos = request.form.get('num_photos')
+        else:
+            num_photos = 10  # Default number of photos for GET request
+        photos = flickr.people.getPhotos(user_id=current_user.id, per_page=num_photos)
+        return render_template('photos.html', photos=photos['photos']['photo'])
+    except Exception as e:
+        logging.error(e, exc_info=True)
+        flash("Error fetching photos: {}".format(e), "error")
     return render_template('photos.html')
 
 @app.route('/set_privacy_date_range', methods=['POST'])
@@ -112,28 +113,24 @@ def set_privacy_date_range():
                                    is_friend=0, is_family=0, perm_comment=0, perm_addmeta=0)
         flash("Privacy settings updated successfully", "success")
     except Exception as e:
-        logging.error(str(e))
-        flash("Error updating privacy settings", "error")
+        logging.error(e, exc_info=True)
+        flash("Error updating privacy settings: {}".format(e), "error")
     return redirect(url_for('index'))
 
 @app.route('/albums', methods=['GET', 'POST'])
 @login_required
 def albums():
-    if request.method == 'POST':
-        album_id = request.form.get('album_id')
-        try:
+    try:
+        if request.method == 'POST':
+            album_id = request.form.get('album_id')
             photos = flickr.photosets.getPhotos(user_id=current_user.id, photoset_id=album_id)
             return render_template('photos.html', photos=photos['photoset']['photo'])
-        except Exception as e:
-            logging.error(str(e))
-            flash("Error fetching album photos", "error")
-    else:
-        try:
+        else:
             albums = flickr.photosets.getList(user_id=current_user.id)
             return render_template('albums.html', albums=albums['photosets']['photoset'])
-        except Exception as e:
-            logging.error(str(e))
-            flash("Error fetching albums", "error")
+    except Exception as e:
+        logging.error(e, exc_info=True)
+        flash("Error: {}".format(e), "error")
     return render_template('albums.html')
 
 @app.route('/date', methods=['GET', 'POST'])
@@ -146,8 +143,8 @@ def date():
             photos = flickr.people.getPhotos(user_id=current_user.id, min_upload_date=min_date, max_upload_date=max_date)
             return render_template('photos.html', photos=photos['photos']['photo'])
         except Exception as e:
-            logging.error(str(e))
-            flash("Error fetching photos by date", "error")
+            logging.error(e, exc_info=True)
+            flash("Error fetching photos by date: {}".format(e), "error")
     return render_template('date.html')
 
 @app.route('/error')
