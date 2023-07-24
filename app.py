@@ -21,6 +21,9 @@ class User(UserMixin):
 users = {
     "davis": User("davis", "davis", generate_password_hash("test")),
     "davisdeaton": User("davisdeaton", "davisdeaton", generate_password_hash("1234")),
+    "davisdeatonphotography": User("davisdeatonphotography", "davisdeatonphotography", generate_password_hash("1234")),
+}
+
 }
 flickr = flickrapi.FlickrAPI(os.environ['FLICKR_API_KEY'], os.environ['FLICKR_API_SECRET'], cache=True)
 
@@ -52,20 +55,6 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
-@app.route('/landing', methods=['GET', 'POST'])
-def landing():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        try:
-            # Validate the username with the Flickr API
-            user_info = flickr.people.findByUsername(username=username)
-            if 'user' in user_info:
-                # If the username is valid, log in the user
-                login_user(User(username, username, 'dummy_password_hash'))
-                return redirect(url_for('index'))
-        except Exception as e:
-            flash('Invalid Flickr username', 'error')
-    return render_template('landing.html')
 
 
 @app.route('/set_privacy_metadata', methods=['GET', 'POST'])
