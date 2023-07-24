@@ -1,6 +1,6 @@
 $env:GIT_ASKPASS = "echo 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"; `
 git add .; `
-git commit -m "v 0.4.6"; `
+git commit -m "v 0.4.7 landing"; `
 git push origin master; `
 Remove-Item Env:\GIT_ASKPASS; `
 heroku git:remote -a flickr-privacy; `
