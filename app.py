@@ -7,11 +7,6 @@ import flickrapi
 
 app = Flask(__name__)
 app.secret_key = '1234'  # Replace 'your_secret_key' with a real secret key
-class User(UserMixin):
-    def __init__(self, id, username, password_hash):
-        self.id = id
-        self.username = username
-        self.password_hash = password_hash
 
 
 login_manager = LoginManager()  # LoginManager instance
@@ -29,10 +24,6 @@ users = {
     "davisdeaton": generate_password_hash("1234"),
 }
 
-@login_manager.user_loader
-def load_user(user_id):
-    if user_id in users:
-        return User(id=user_id, username=user_id, password_hash=users[user_id])
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
