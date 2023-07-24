@@ -16,7 +16,7 @@ git add .
 git commit -m "v 0.1."
 
 # Push the changes to your GitHub repository using the personal access token
-PERSONAL_ACCESS_TOKEN="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" git push origin master
+PERSONAL_ACCESS_TOKEN="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" git push origin master
 
 # Clean up the Git AskPass script
 rm -f "${GIT_ASKPASS_SCRIPT}"
