@@ -4,11 +4,10 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 import flickrapi
-
+from flask_wtf import CSRFProtect
 app = Flask(__name__)
 app.secret_key = '1234'  # Replace 'your_secret_key' with a real secret key
-
-
+csrf = CSRFProtect(app)
 login_manager = LoginManager()  # LoginManager instance
 login_manager.init_app(app)
 
