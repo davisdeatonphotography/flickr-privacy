@@ -13,9 +13,10 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 class User(UserMixin):
-    def __init__(self, id, username, password_hash):
-        self.id = id
+    def __init__(self, id, username, flickr_username, password_hash):
+        self.id = id 
         self.username = username
+        self.flickr_username = flickr_username
         self.password_hash = password_hash
 
 users = {
@@ -33,23 +34,27 @@ def index():
 
 @login_manager.user_loader
 def load_user(user_id):
-    user = users.get(user_id)
+    current_user.flickr_username
     if user:
         return user
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        user = users.get(username)
-        if user and check_password_hash(user.password_hash, password):
-            login_user(user)
-            return redirect(url_for('index'))
-        else:
-            flash('Invalid username or password', 'error')
-    return render_template('login.html')
-
+  if request.method == 'POST':
+    username = request.form.get('username')
+    password = request.form.get('password')
+    flickr_username = request.form.get('flickr_username')
+    
+    user = users.get(username)
+    if user and check_password_hash(user.password_hash, password):
+      # Update user object with flickr_username
+      user = User(user.id, user.username, flickr_username, user.password_hash)  
+      login_user(user)
+      return redirect(url_for('index'))
+    else:
+      flash('Invalid username or password', 'error')
+      
+  return render_template('login.html')
 @app.route('/logout')
 @login_required
 def logout():
