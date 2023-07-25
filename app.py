@@ -24,7 +24,8 @@ users = {
     "davisdeatonphotography": User("davisdeatonphotography", "davisdeatonphotography", generate_password_hash("1234")),
 }
 
-flickr = flickrapi.FlickrAPI(os.environ['FLICKR_API_KEY'], os.environ['FLICKR_API_SECRET'], cache=True, format='parsed-json')
+
+flickr = flickrapi.FlickrAPI(os.environ['FLICKR_API_KEY'], os.environ['FLICKR_API_SECRET'], cache=True)
 
 @app.route('/')
 def index():
@@ -32,9 +33,7 @@ def index():
 
 @login_manager.user_loader
 def load_user(user_id):
-    user = users.get(user_id)
-    if user:
-        return user
+    return users.get(user_id)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -55,15 +54,16 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+
 @app.route('/set_privacy_metadata', methods=['GET', 'POST'])
 @login_required
 def set_privacy_metadata():
     min_date = request.form.get('min_date')
     max_date = request.form.get('max_date')
-    is_public = int(request.form.get('is_public'))
+    is_public = request.form.get('is_public')
     try:
         user_info = flickr.people.findByUsername(username=current_user.id)
-        flickr_user_id = user_info['user']['nsid']
+        flickr_user_id = user_info.get('user', {}).get('nsid')
 
         photos = flickr.photos.search(user_id=flickr_user_id, min_taken_date=min_date, max_taken_date=max_date)
         for photo in photos['photos']['photo']:
@@ -78,10 +78,10 @@ def set_privacy_metadata():
 @login_required
 def set_album_privacy():
     album_id = request.form.get('album_id')
-    is_public = int(request.form.get('is_public'))
+    is_public = request.form.get('is_public')
     try:
         user_info = flickr.people.findByUsername(username=current_user.id)
-        flickr_user_id = user_info['user']['nsid']
+        flickr_user_id = user_info.get('user', {}).get('nsid')
 
         photos = flickr.photosets.getPhotos(user_id=flickr_user_id, photoset_id=album_id)
         for photo in photos['photoset']['photo']:
@@ -100,7 +100,7 @@ def photos():
         num_photos = request.form.get('num_photos')
         try:
             user_info = flickr.people.findByUsername(username=current_user.id)
-            flickr_user_id = user_info['user']['nsid']
+            flickr_user_id = user_info.get('user', {}).get('nsid')
 
             photos = flickr.people.getPhotos(user_id=flickr_user_id, per_page=int(num_photos))
             return render_template('photos.html', photos=photos['photos']['photo'])
@@ -109,15 +109,16 @@ def photos():
             flash("Error fetching photos", "error")
     return render_template('photos.html')
 
+
 @app.route('/set_privacy_date_range', methods=['GET', 'POST'])
 @login_required
 def set_privacy_date_range():
     start_date = request.form.get('start_date')
     end_date = request.form.get('end_date')
-    is_public = int(request.form.get('is_public'))
+    is_public = request.form.get('is_public')
     try:
         user_info = flickr.people.findByUsername(username=current_user.id)
-        flickr_user_id = user_info['user']['nsid']
+        flickr_user_id = user_info.get('user', {}).get('nsid')
 
         photos = flickr.photos.search(user_id=flickr_user_id, min_upload_date=start_date, max_upload_date=end_date)
         for photo in photos['photos']['photo']:
@@ -136,7 +137,7 @@ def albums():
         album_id = request.form.get('album_id')
         try:
             user_info = flickr.people.findByUsername(username=current_user.id)
-            flickr_user_id = user_info['user']['nsid']
+            flickr_user_id = user_info.get('user', {}).get('nsid')
 
             photos = flickr.photosets.getPhotos(user_id=flickr_user_id, photoset_id=album_id)
             return render_template('photos.html', photos=photos['photoset']['photo'])
@@ -146,7 +147,7 @@ def albums():
     else:
         try:
             user_info = flickr.people.findByUsername(username=current_user.id)
-            flickr_user_id = user_info['user']['nsid']
+            flickr_user_id = user_info.get('user', {}).get('nsid')
 
             albums = flickr.photosets.getList(user_id=flickr_user_id)
             return render_template('albums.html', albums=albums['photosets']['photoset'])
@@ -154,6 +155,7 @@ def albums():
             logging.error(str(e))
             flash("Error fetching albums", "error")
     return render_template('albums.html')
+
 
 @app.route('/date', methods=['GET', 'POST'])
 @login_required
@@ -163,7 +165,7 @@ def date():
         max_date = request.form.get('max_date')
         try:
             user_info = flickr.people.findByUsername(username=current_user.id)
-            flickr_user_id = user_info['user']['nsid']
+            flickr_user_id = user_info.get('user', {}).get('nsid')
 
             photos = flickr.people.getPhotos(user_id=flickr_user_id, min_upload_date=min_date, max_upload_date=max_date)
             return render_template('photos.html', photos=photos['photos']['photo'])
