@@ -4,7 +4,11 @@
 <div class="grid grid-cols-3 gap-4">
     {% for photo in photos %}
         <div>
-            <img src="{{ photo.url }}" class="rounded shadow-md">
+            <img src="https://farm{{ photo.farm }}.staticflickr.com/{{ photo.server }}/{{ photo.id }}_{{ photo.secret }}_s.jpg" class="rounded shadow-md">
+            <div class="photo-details">
+                <p>Title: {{ photo.title }}</p>
+                <p>ID: {{ photo.id }}</p>
+            </div>
         </div>
     {% endfor %}
 </div>
