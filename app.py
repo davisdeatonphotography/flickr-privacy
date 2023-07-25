@@ -16,7 +16,7 @@ class User(UserMixin):
   def __init__(self, id, username, flickr_username, password_hash):
     self.id = id
     self.username = username
-    self.flickr_username = None # Initialize to None
+    self.flickr_username = flickr_username
     self.password_hash = password_hash
 
 users = {
@@ -24,7 +24,6 @@ users = {
   "davisdeaton": User("davisdeaton", "davisdeaton", "", generate_password_hash("1234")),
   "davisdeatonphotography": User("davisdeatonphotography", "davisdeatonphotography", "", generate_password_hash("1234")),
 }
-
 
 flickr = flickrapi.FlickrAPI(os.environ['FLICKR_API_KEY'], os.environ['FLICKR_API_SECRET'], cache=True)
 
@@ -55,10 +54,7 @@ def login():
     
     user = users.get(username)
     if user and check_password_hash(user.password_hash, password):
-    
-      # Pass flickr_username to User object
-      user = User(user.id, user.username, flickr_username, user.password_hash)  
-      
+      user.flickr_username = flickr_username
       login_user(user)
       return redirect(url_for('index'))
     else:
@@ -112,7 +108,6 @@ def set_album_privacy():
   
   return redirect(url_for('index'))
 
-  
 @app.route('/photos', methods=['GET', 'POST'])
 @login_required
 def photos():
