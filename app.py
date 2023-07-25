@@ -16,7 +16,7 @@ class User(UserMixin):
   def __init__(self, id, username, flickr_username, password_hash):
     self.id = id
     self.username = username
-    self.flickr_username = flickr_username
+    self.flickr_username = None # Initialize to None
     self.password_hash = password_hash
 
 users = {
@@ -38,17 +38,27 @@ def load_user(user_id):
   if user:
     return user
 
-@app.route('/login', methods=['GET', 'POST'])  
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+
   if request.method == 'POST':
+  
     username = request.form.get('username')
     password = request.form.get('password')
+    
     flickr_username = request.form.get('flickr_username')
+    if not flickr_username:
+      flash('Flickr username required', 'error')
+      return redirect(url_for('login'))
+    
+    print(f"FLICKR USERNAME: {flickr_username}")
     
     user = users.get(username)
     if user and check_password_hash(user.password_hash, password):
-      # Update user with flickr_username
-      user = User(user.id, user.username, flickr_username, user.password_hash)
+    
+      # Pass flickr_username to User object
+      user = User(user.id, user.username, flickr_username, user.password_hash)  
+      
       login_user(user)
       return redirect(url_for('index'))
     else:
