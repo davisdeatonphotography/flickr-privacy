@@ -24,8 +24,7 @@ users = {
     "davisdeatonphotography": User("davisdeatonphotography", "davisdeatonphotography", generate_password_hash("1234")),
 }
 
-
-flickr = flickrapi.FlickrAPI(os.environ['FLICKR_API_KEY'], os.environ['FLICKR_API_SECRET'], cache=True)
+flickr = flickrapi.FlickrAPI(os.environ['FLICKR_API_KEY'], os.environ['FLICKR_API_SECRET'], cache=True, format='parsed-json')
 
 @app.route('/')
 def index():
@@ -56,13 +55,12 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-
 @app.route('/set_privacy_metadata', methods=['GET', 'POST'])
 @login_required
 def set_privacy_metadata():
     min_date = request.form.get('min_date')
     max_date = request.form.get('max_date')
-    is_public = request.form.get('is_public')
+    is_public = int(request.form.get('is_public'))
     try:
         user_info = flickr.people.findByUsername(username=current_user.id)
         flickr_user_id = user_info['user']['nsid']
@@ -80,7 +78,7 @@ def set_privacy_metadata():
 @login_required
 def set_album_privacy():
     album_id = request.form.get('album_id')
-    is_public = request.form.get('is_public')
+    is_public = int(request.form.get('is_public'))
     try:
         user_info = flickr.people.findByUsername(username=current_user.id)
         flickr_user_id = user_info['user']['nsid']
@@ -111,13 +109,12 @@ def photos():
             flash("Error fetching photos", "error")
     return render_template('photos.html')
 
-
 @app.route('/set_privacy_date_range', methods=['GET', 'POST'])
 @login_required
 def set_privacy_date_range():
     start_date = request.form.get('start_date')
     end_date = request.form.get('end_date')
-    is_public = request.form.get('is_public')
+    is_public = int(request.form.get('is_public'))
     try:
         user_info = flickr.people.findByUsername(username=current_user.id)
         flickr_user_id = user_info['user']['nsid']
@@ -157,7 +154,6 @@ def albums():
             logging.error(str(e))
             flash("Error fetching albums", "error")
     return render_template('albums.html')
-
 
 @app.route('/date', methods=['GET', 'POST'])
 @login_required
